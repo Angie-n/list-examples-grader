@@ -33,14 +33,21 @@ fi
 java -cp .:lib/hamcrest-core-1.3.jar:lib/junit-4.13.2.jar org.junit.runner.JUnitCore TestListExamples > tests.txt
 
 testString=`grep "Failures" tests.txt`
-runString=${testString%%,*}
-failString=${testString#*,}
-echo $runString > tests.txt
-totalRun=`grep -Eo '[0-9]{1,}' tests.txt`
-echo $failString > tests.txt
-totalFailed=`grep -Eo '[0-9]{1,}' tests.txt`
-let totalPassed=$totalRun-$totalFailed
-echo "Score: $totalPassed / $totalRun"
+if [ -z "$testString" ] 
+then    
+    testString=`grep "OK" tests.txt`
+    totalRun=`echo "$testString" | grep -o -E '[0-9]+'`
+    echo "Score: $totalRun / $totalRun"
+else 
+    runString=${testString%%,*}
+    failString=${testString#*,}
+    echo $runString > tests.txt
+    totalRun=`grep -Eo '[0-9]{1,}' tests.txt`
+    echo $failString > tests.txt
+    totalFailed=`grep -Eo '[0-9]{1,}' tests.txt`
+    let totalPassed=$totalRun-$totalFailed
+    echo "Score: $totalPassed / $totalRun"
+fi
 
 # Then, add here code to compile and run, and do any post-processing of the
 # tests
